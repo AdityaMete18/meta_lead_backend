@@ -1,24 +1,44 @@
 const express = require('express');
-
 const app = express();
+
+app.use(express.json());
 
 const leads = [
   {
     id: '1',
-    name: 'Rahul Sharma',
-    email: 'rahul@example.com',
+    name: 'Aditya Mete',
+    email: 'adityamete@gmail.com',
     phone: '9876543210'
   },
   {
     id: '2',
-    name: 'Priya Patel',
-    email: 'priya@example.com',
-    phone: '9876543211'
+    name: 'Pratima Shinde',
+    email: 'pratimashinde@gmail.com',
+    phone: '9123456780'
   }
 ];
 
 app.get('/leads', (req, res) => {
   res.json(leads);
+});
+
+app.post('/leads', (req, res) => {
+  const { name, email, phone } = req.body;
+
+
+  const newLead = {
+    id: Date.now().toString(),
+    name: name,
+    email: email,
+    phone: phone
+  };
+
+  leads.unshift(newLead);
+
+  res.status(201).json({
+    message: 'Lead added successfully',
+    lead: newLead
+  });
 });
 
 app.listen(3000, () => {
