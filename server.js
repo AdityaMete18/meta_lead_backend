@@ -3,6 +3,8 @@ const app = express();
 
 app.use(express.json());
 
+const VERIFY_TOKEN = 'metalead_verify_2026';
+
 const leads = [
   {
     id: '1',
@@ -18,6 +20,7 @@ const leads = [
   }
 ];
 
+// Existing routes
 app.get('/leads', (req, res) => {
   res.json(leads);
 });
@@ -25,12 +28,11 @@ app.get('/leads', (req, res) => {
 app.post('/leads', (req, res) => {
   const { name, email, phone } = req.body;
 
-
   const newLead = {
     id: Date.now().toString(),
-    name: name,
-    email: email,
-    phone: phone
+    name,
+    email,
+    phone
   };
 
   leads.unshift(newLead);
@@ -41,6 +43,25 @@ app.post('/leads', (req, res) => {
   });
 });
 
+// Meta webhook verification
+app.get('/webhook', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    return res.status(200).send(challenge);
+  }
+
+  res.sendStatus(403);
+});
+
+// Receive Meta webhook notifications
+app.post('/webhook', (req, res) => {
+  console.log('Meta webhook received:', JSON.stringify(req.body));
+  res.sendStatus(200);
+});
+
 app.listen(3000, () => {
-  console.log('port 3000');
+  console.log('Server running on port 3000');
 });
